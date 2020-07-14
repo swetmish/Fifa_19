@@ -22,30 +22,36 @@ object Main_Fifa {
 
     //start - Which position pays the highest wage in average?
 
-    /*var data3 = df.withColumn("Wage", functions.regexp_replace(df.col("Wage"), "\\D", ""))
+    var data3 = df.withColumn("Wage", functions.regexp_replace(df.col("Wage"), "\\D", ""))
     data3.createOrReplaceTempView("data3")
     var data4 = spark.sql("select Position, avg(Wage) as wg from data3 group by Position")
-    var max_avg_wage = data4.groupBy().max("wg").show()
-    data4.filter(data4("wg") === max_avg_wage).select("Position").show()*/
+    var max_avg_wage = data4.groupBy().max("wg")
+    data4.filter(data4("wg") === max_avg_wage.first.get(0)).select("Position").show()
 
-    //end - Which position pays the highest wage in average?
+
+       //end - Which position pays the highest wage in average?
 
     //start - Which team has the most expensive squad value in the world? Does that team also have the largest wage bill ?
 
     var data_exp = df.withColumn("Value", functions.regexp_replace(df.col("Value"), "\\D", ""))
     import org.apache.spark.sql.types._
-    //val max_Value = data_exp.withColumn("Value", data_exp("Value").cast(IntegerType)).groupBy().max("Value").show()
-    //println(max_Value("Value"))
-    //var max_val = data_exp.groupBy().max("Value").show()
-    //data_exp.filter(data_exp("Value") === ).select("Club").show()
-
-    //spark.sql("select Club, Value, rank() over (order by Value desc) as rank  from data_exp where rank == 1").show()
-
-
-
-
-
+    val max_Value = data_exp.withColumn("Value", data_exp("Value").cast(IntegerType)).groupBy().max("Value")
+    println("max Value of Club:", max_Value.first.get(0).toString)
+    println("Club having max value")
+    data_exp.filter(data_exp("Value") === max_Value.first.get(0).toString).select("Club").show()
+    var data_wage = df.withColumn("Wage", functions.regexp_replace(df.col("Wage"), "\\D", ""))
+    val max_Wage_Value = data_wage.withColumn("Wage", data_wage("Wage").cast(IntegerType)).groupBy().max("Wage")
+    println("max Wage of Club:", max_Wage_Value.first.get(0).toString)
+    println("Club having max Wage")
+    data_wage.filter(data_wage("Wage") === max_Wage_Value.first.get(0).toString).select("Club").show()
+    if(max_Wage_Value.first.get(0).toString.equals(max_Value.first.get(0).toString)){
+      println("yes the team has also the largest wage bill")
+    }else{
+      println("No the team does not largest wage bill")
+    }
 
     //end - Which team has the most expensive squad value in the world? Does that team also have the largest wage bill ?
+
+
   }
 }
